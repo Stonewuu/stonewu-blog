@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.BlogsettingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.Blogsetting">
+        <id column="id" property="id" />
+        <result column="setting_name" property="settingName" />
+        <result column="active" property="active" />
+        <result column="open" property="open" />
+        <result column="open_recaptcha" property="openRecaptcha" />
+        <result column="open_xss_protect" property="openXssProtect" />
+        <result column="blog_domain" property="blogDomain" />
+        <result column="cdn_domain" property="cdnDomain" />
+        <result column="upload_path" property="uploadPath" />
+        <result column="check_reply" property="checkReply" />
+        <result column="resource_version" property="resourceVersion" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, setting_name, active, open, open_recaptcha, open_xss_protect, blog_domain, cdn_domain, upload_path, check_reply, resource_version
+    </sql>
+
+</mapper>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:with="
+title=${(isCategory!=null?currCategory.className+' - ':'')
++(isSearch!=null?keywords+'的搜索结果 - ':'')
++(isTag!=null?'标签'+tag.tagName+'下的文章 - ':'')
++(isGroup!=null?'归档'+year+'年下的文章 - ':'')}"
+      class="pagenation shadow">
+    <th:block th:insert="layout :: resource"></th:block>
+    <meta name="keywords" content="Stonewu,博客,Stonewu的博客,java,javaweb">
+    <meta name="description" content="Stonewu的博客">
+    <meta property="og:description" content="Stonewu的博客">
+    <title th:text="${title + activeInfo.blogName}"></title>
+    <meta name="baidu_union_verify" content="3fa91761629fd521c5317db5990d1fa7">
+</head>
+<body>
+<th:block th:insert="layout :: header"></th:block>
+<th:block th:insert="layout :: middlebar"></th:block>
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <div class="art-list">
+                    <div class="result-tips intro shadow" th:if="${isIndex == null}">
+                        <th:block th:if="${isCategory!=null}" th:text="${'您正在查看'+('分类：'+currCategory.className+' 下的文章')}"></th:block>
+                        <th:block th:if="${isSearch!=null}" th:text="${'您正在查看'+('关键字：'+keywords+' 的搜索结果')}"></th:block>
+                        <th:block th:if="${isTag!=null}" th:text="${'您正在查看'+('标签：'+tag.tagName+' 下的文章')}"></th:block>
+                        <th:block th:if="${isGroup!=null}" th:text="${'您正在查看'+('归档 '+year+'年 下的文章')}"></th:block>
+                    </div>
+                    <div th:if="${articles.total==0}" class="result-tips err shadow">
+                        似乎进入了未知次元Σ(っ°Д°;)っ
+                    </div>
+                    <div class="item shadow index-article" th:each="article:${articles?.records}">
+                        <h1 class="title nowraptext dot">
+                            <a th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}}"
+                               th:text="${article.title}">标题</a>
+                        </h1>
+                        <div class="intro">
+                            <div>
+                                作者：
+                                <th:block th:text="${article.authorName}"></th:block>
+                                &nbsp;|&nbsp; 时间：
+                                <th:block
+                                        th:text="${#temporals.format(article.createTime, 'yyyy-MM-dd HH:mm:ss')}"></th:block>&nbsp;&nbsp;|&nbsp;&nbsp;
+                            </div>
+                            <div>
+                                分类：
+                                <a th:href="@{${activeSetting.blogDomain}+'/category/'+${article.classIdentName}}"
+                                   th:text="${article.className}"></a>
+                                <th:block>
+                                    &nbsp;|&nbsp;
+                                    <a th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}+'#reply-list'}"
+                                       th:text="${article.replyNum}"></a>
+                                    条评论
+                                </th:block>
+                                <th:block>
+                                    &nbsp;|&nbsp;
+                                    <th:block th:text="${article.viewNum}"></th:block>
+                                    次浏览
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="content" th:utext="${article.needPreview?article.previewContent:article.content}">
+                        </div>
+                        <div class="show-more" th:classappend="${article.needPreview?'active':''}">
+                            <a th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}}">- 阅读全文 -</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${articles.total > articles.size}"
+                     th:with="prefix=${(isCategory!=null?'/category/'+currCategory.identName:'')+(isSearch!=null?'/search/'+keywords:'')+(isTag!=null?'/tag/'+tag.tagName:'')+(isGroup!=null?'/group/'+year:'')}"
+                     class="pagenation">
+                    <a th:if="${articles.current > 1}"
+                       th:href="${activeSetting.blogDomain}+${prefix}+ '/page/'+ ${articles.current - 1}">上一页</a>
+                    <a th:each="count:${#numbers.sequence(1,articles.total/articles.size + 1)}"
+                       th:href="${activeSetting.blogDomain}+${prefix} + '/page/'+ ${count}"
+                       th:text="${count}" th:classappend="${count == articles.current?'active':''}"></a>
+                    <a th:if="${articles.current < articles.total/articles.size + 1}"
+                       th:href="${activeSetting.blogDomain}+${prefix}  + '/page/'+ ${articles.current + 1}">下一页</a>
+                </div>
+            </div>
+            <th:block th:insert="layout :: sidebar"></th:block>
+        </div>
+    </div>
+</main>
+<th:block th:insert="layout :: foot"></th:block>
+</body>
+</html>

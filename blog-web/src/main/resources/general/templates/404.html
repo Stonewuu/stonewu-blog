@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${'未知次元 - ' + activeInfo.blogName}"></title>
+    <th:block th:insert="layout :: resource"></th:block>
+</head>
+<body>
+<th:block th:insert="layout :: header"></th:block>
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-8 art-main">
+                <div class="result-tips err shadow">
+                    似乎进入了未知次元Σ(っ°Д°;)っ
+                </div>
+            </div>
+            <th:block th:insert="layout :: sidebar"></th:block>
+        </div>
+    </div>
+</main>
+<th:block th:insert="layout :: foot"></th:block>
+</body>
+</html>

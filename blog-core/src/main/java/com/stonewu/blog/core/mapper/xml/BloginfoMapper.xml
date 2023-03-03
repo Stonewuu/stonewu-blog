@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.BloginfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.Bloginfo">
+        <id column="id" property="id" />
+        <result column="info_name" property="infoName" />
+        <result column="active" property="active" />
+        <result column="blog_name" property="blogName" />
+        <result column="blog_owner" property="blogOwner" />
+        <result column="hello_msg" property="helloMsg" />
+        <result column="use_bg" property="useBg" />
+        <result column="middle_bg" property="middleBg" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, info_name, active, blog_name, blog_owner, hello_msg, use_bg, middle_bg
+    </sql>
+
+</mapper>

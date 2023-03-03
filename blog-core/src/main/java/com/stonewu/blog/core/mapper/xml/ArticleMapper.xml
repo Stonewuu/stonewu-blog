@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.Article">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="author_id" property="authorId"/>
+        <result column="hot_count" property="hotCount"/>
+        <result column="ident_name" property="identName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="keyword" property="keyword"/>
+        <result column="description" property="description"/>
+        <result column="preview_content" property="previewContent"/>
+        <result column="need_preview" property="needPreview"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, author_id, hot_count, ident_name, category_id, keyword, description, preview_content, need_preview, status, create_time, update_time
+    </sql>
+
+    <resultMap id="ArticleWithMoreInfoResultMap" type="com.stonewu.blog.core.entity.custom.ArticleWithMoreInfo">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="author_id" property="authorId"/>
+        <result column="hot_count" property="hotCount"/>
+        <result column="ident_name" property="identName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="keyword" property="keyword"/>
+        <result column="description" property="description"/>
+        <result column="preview_content" property="previewContent"/>
+        <result column="need_preview" property="needPreview"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="class_name" property="className"/>
+        <result column="class_ident_name" property="classIdentName"/>
+        <result column="author_name" property="authorName"/>
+        <result column="reply_num" property="replyNum"/>
+    </resultMap>
+
+    <resultMap id="YearGroup" type="com.stonewu.blog.core.entity.custom.YearGroup">
+        <result column="year" property="year"/>
+        <result column="count" property="count"/>
+
+    </resultMap>
+
+    <select id="selectArticleMoreWithReply" resultMap="ArticleWithMoreInfoResultMap"
+            parameterType="com.stonewu.blog.core.entity.custom.ArticleWithMoreInfo">
+        SELECT
+        a.*, m.`nick_name` author_name,
+        c.class_name,c.ident_name as class_ident_name, count(r.id) as reply_num
+        FROM
+        article a
+        LEFT JOIN menber m ON m.id = a.author_id
+        LEFT JOIN category c ON c.id = a.category_id
+        LEFT JOIN reply r ON a.id = r.article_id and
+        ( r.check_reply = 1
+        <if test="menberParam != null and menberParam.id != null">
+            or r.author_id = #{menberParam.id}
+        </if>
+        )
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectArticleMore" resultMap="ArticleWithMoreInfoResultMap"
+            parameterType="com.stonewu.blog.core.entity.custom.ArticleWithMoreInfo">
+        SELECT
+        a.*, m.`nick_name` author_name,
+        c.class_name,c.ident_name as class_ident_name
+        FROM
+        article a
+        LEFT JOIN menber m ON m.id = a.author_id
+        LEFT JOIN category c ON c.id = a.category_id
+        LEFT JOIN reply r ON a.id = r.article_id and r.check_reply = 1
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectRecentReply" resultMap="ArticleWithMoreInfoResultMap"
+            parameterType="com.stonewu.blog.core.entity.custom.ArticleWithMoreInfo">
+        SELECT
+        a.*, m.`nick_name` author_name,
+        c.class_name,c.ident_name as class_ident_name
+        FROM
+        article a
+        LEFT JOIN menber m ON m.id = a.author_id
+        LEFT JOIN category c ON c.id = a.category_id
+        ,reply r
+        where a.id = r.article_id
+        and a.id = r.article_id
+        and a.status = 1
+        and r.check_reply = 1
+        group by r.article_id, r.create_time
+        order by r.create_time desc
+    </select>
+
+    <select id="selectGroupByCreateTime" resultMap="YearGroup">
+       SELECT YEAR(create_time) as 'year' , count(*) as 'count' FROM article where status = 1 GROUP BY YEAR(create_time)
+    </select>
+
+    <select id="selectByTagNamePage" resultMap="ArticleWithMoreInfoResultMap">
+        select
+        a.*, m.`nick_name` author_name,
+        c.class_name,c.ident_name as class_ident_name, count(r.id) as reply_num
+        FROM
+        article a
+        LEFT JOIN menber m ON m.id = a.author_id
+        LEFT JOIN category c ON c.id = a.category_id
+        LEFT JOIN reply r ON a.id = r.article_id and
+        ( r.check_reply = 1
+        <if test="menberParam != null and menberParam.id != null">
+            or r.author_id = #{menberParam.id}
+        </if>
+        )
+        ,article_tag_link atl, article_tag atag
+        where 1 = 1
+        and atl.article_id = a.id and atl.tag_id = atag.id and atag.tag_name = #{tagName}
+        and a.status = 1
+        group by a.id, a.update_time
+        order by a.update_time desc
+    </select>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.NavigationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.Navigation">
+        <id column="id" property="id"/>
+        <result column="enable" property="enable"/>
+        <result column="ident_name" property="identName"/>
+        <result column="nav_link" property="navLink"/>
+        <result column="nav_name" property="navName"/>
+        <result column="order_by" property="orderBy"/>
+        <result column="out_link" property="outLink"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, enable, ident_name, nav_link, nav_name, order_by, out_link, create_time
+    </sql>
+
+</mapper>

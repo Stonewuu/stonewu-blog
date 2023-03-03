@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.ReplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.Reply">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="reply_type" property="replyType"/>
+        <result column="article_id" property="articleId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="parent_reply_id" property="parentReplyId"/>
+        <result column="check_reply" property="checkReply"/>
+        <result column="top_reply_id" property="topReplyId"/>
+        <result column="send_email" property="sendEmail"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, content, reply_type, article_id, author_id, parent_reply_id, check_reply, top_reply_id, send_email,
+        create_time
+    </sql>
+
+    <resultMap type="com.stonewu.blog.core.entity.custom.ReplyTree" id="replyResult">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="reply_type" property="replyType"/>
+        <result column="article_id" property="articleId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="parent_reply_id" property="parentReplyId"/>
+        <result column="check_reply" property="checkReply"/>
+        <result column="top_reply_id" property="topReplyId"/>
+        <result column="send_email" property="sendEmail"/>
+        <result column="create_time" property="createTime"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="author_name" property="authorName"/>
+    </resultMap>
+
+    <resultMap type="com.stonewu.blog.core.entity.custom.ReplyTree" id="replyTree">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="reply_type" property="replyType"/>
+        <result column="article_id" property="articleId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="parent_reply_id" property="parentReplyId"/>
+        <result column="check_reply" property="checkReply"/>
+        <result column="top_reply_id" property="topReplyId"/>
+        <result column="send_email" property="sendEmail"/>
+        <result column="create_time" property="createTime"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="author_name" property="authorName"/>
+        <collection column="id=id,authorId=author_id" property="children" ofType="com.stonewu.blog.core.entity.custom.ReplyTree" javaType="java.util.ArrayList" select="getReplyChildren">
+
+        </collection>
+    </resultMap>
+    <resultMap type="com.stonewu.blog.core.entity.custom.ReplyTree" id="replyTreeChild">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="reply_type" property="replyType"/>
+        <result column="article_id" property="articleId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="parent_reply_id" property="parentReplyId"/>
+        <result column="check_reply" property="checkReply"/>
+        <result column="top_reply_id" property="topReplyId"/>
+        <result column="send_email" property="sendEmail"/>
+        <result column="create_time" property="createTime"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="author_name" property="authorName"/>
+        <collection column="id=id,authorId=author_id" property="children" ofType="com.stonewu.blog.core.entity.custom.ReplyTree" javaType="java.util.ArrayList" select="getReplyChildren">
+
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="ReplyInfoMap" type="com.stonewu.blog.core.entity.custom.ReplyInfo">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="reply_type" property="replyType"/>
+        <result column="article_id" property="articleId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="parent_reply_id" property="parentReplyId"/>
+        <result column="check_reply" property="checkReply"/>
+        <result column="top_reply_id" property="topReplyId"/>
+        <result column="send_email" property="sendEmail"/>
+        <result column="create_time" property="createTime"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="author_name" property="authorName"/>
+    </resultMap>
+
+    <select id="findReplyInfoByPage" parameterType="com.stonewu.blog.core.entity.custom.ReplyInfo"
+            resultMap="ReplyInfoMap">
+        SELECT
+        r.*, a.title article_title,
+        m.nick_name author_name
+        FROM
+        reply r
+        LEFT JOIN article a ON r.article_id = a.id
+        LEFT JOIN menber m ON m.id = r.author_id
+        WHERE 1 = 1
+        <if test="param.id != null">
+            AND a.id = #{param.id}
+        </if>
+        <if test="param.authorId != null">
+            AND m.id = #{param.authorId}
+        </if>
+        <if test="param.articleId != null">
+            AND article_id = #{param.articleId}
+        </if>
+        <if test="param.topReplyId != null">
+            AND top_reply_id = #{param.topReplyId}
+        </if>
+        <if test="param.parentReplyId != null">
+            AND parent_reply_id = #{param.parentReplyId}
+        </if>
+        <if test="param.checkReply != null">
+            AND check_reply = #{param.checkReply}
+        </if>
+        <if test="param.replyType != null">
+            AND reply_type = #{param.replyType}
+        </if>
+    </select>
+
+    <select id="findReplyTreeByParam" parameterType="com.stonewu.blog.core.entity.custom.ReplyTree"
+            resultMap="replyTree">
+        SELECT
+        r.*, a.title article_title,
+        m.nick_name author_name
+        FROM
+        reply r
+        LEFT JOIN article a ON r.article_id = a.id
+        LEFT JOIN menber m ON m.id = r.author_id
+        WHERE 1 = 1
+        <if test="param.id != null">
+            AND a.id = #{param.id}
+        </if>
+        <if test="param.articleId != null">
+            AND article_id = #{param.articleId}
+        </if>
+        <if test="param.topReplyId != null">
+            AND top_reply_id = #{param.topReplyId}
+        </if>
+        AND parent_reply_id is null
+        <if test="param.checkReply != null">
+            AND ( check_reply = #{param.checkReply}
+            <if test="param.authorId != null">
+                or m.id = #{param.authorId}
+            </if>
+            )
+        </if>
+        <if test="param.replyType != null">
+            AND reply_type = #{param.replyType}
+        </if>
+
+    </select>
+
+    <select id="findReplyResultByParam" parameterType="com.stonewu.blog.core.entity.custom.ReplyTree"
+            resultMap="replyTree">
+        SELECT
+        r.*, a.title article_title,
+        m.nick_name author_name
+        FROM
+        reply r
+        LEFT JOIN article a ON r.article_id = a.id
+        LEFT JOIN menber m ON m.id = r.author_id
+        WHERE 1 = 1
+        <if test="param.id != null">
+            AND a.id = #{param.id}
+        </if>
+        <if test="param.articleId != null">
+            AND article_id = #{param.articleId}
+        </if>
+        <if test="param.topReplyId != null">
+            AND top_reply_id = #{param.topReplyId}
+        </if>
+        <if test="param.parentReplyId != null">
+            AND parent_reply_id = #{param.parentReplyId}
+        </if>
+        <if test="param.parentReplyId == null">
+            AND parent_reply_id is null
+        </if>
+        <if test="param.checkReply != null">
+            AND ( check_reply = #{param.checkReply}
+            <if test="param.authorId != null">
+                or m.id = #{param.authorId}
+            </if>
+            )
+        </if>
+        <if test="param.replyType != null">
+            AND reply_type = #{param.replyType}
+        </if>
+
+    </select>
+
+    <select id="getReplyChildren" resultMap="replyTreeChild">
+        SELECT
+        r.*, a.title article_title,
+        m.nick_name author_name
+        FROM
+        reply r
+        LEFT JOIN article a ON r.article_id = a.id
+        LEFT JOIN menber m ON m.id = r.author_id
+        WHERE 1 = 1
+        AND parent_reply_id = #{id}
+        AND (
+            check_reply = 1
+            <if test="authorId != null">
+                or m.id = #{authorId}
+            </if>
+        )
+    </select>
+
+</mapper>

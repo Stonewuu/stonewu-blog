@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${article.title + ' - ' + article.className + ' - ' + activeInfo.blogName}"></title>
+    <th:block th:insert="layout :: resource"></th:block>
+    <meta name="keywords" th:content="${article.keyword}">
+    <meta name="description" th:content="${article.description}">
+    <meta property="og:description" th:content="${article.description}">
+    <meta property="og:title" th:content="${article.title + ' - ' + article.className + ' - ' + activeInfo.blogName}">
+</head>
+<body>
+<th:block th:insert="layout :: header"></th:block>
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-8 art-main">
+                <div class="art-list">
+                    <input type="hidden" class="art-code" th:value="${article.identName}">
+                    <div class="item shadow">
+                        <h1 class="title">
+                            <a th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}}"
+                               th:text="${article.title}">标题</a>
+                        </h1>
+                        <div class="intro">
+                            <div>
+                                作者：
+                                <th:block th:text="${article.authorName}"></th:block>
+                                &nbsp;|&nbsp; 时间：
+                                <th:block
+                                        th:text="${#temporals.format(article.createTime, 'yyyy-MM-dd HH:mm:ss')}"></th:block>&nbsp;&nbsp;|&nbsp;&nbsp;
+                            </div>
+                            <div>
+                                分类：
+                                <a th:href="@{${activeSetting.blogDomain}+'/category/'+${article.classIdentName}}"
+                                   th:text="${article.className}"></a>
+                                <th:block>
+                                    &nbsp;|&nbsp;
+                                    <a th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}+'#reply-list'}"
+                                       th:text="${article.replyNum}"></a>
+                                    条评论
+                                </th:block>
+                                <th:block>
+                                    &nbsp;|&nbsp;
+                                    <th:block th:text="${article.viewNum}"></th:block>
+                                    次浏览
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="content" th:utext="${article.content}"></div>
+                        <div class="tags" th:if="${#lists.size(tags) > 0}">
+                            标签：
+                            <a th:each="tag:${tags}" th:href="@{${activeSetting.blogDomain}+'/tag/'+${tag.tagName}}"
+                               th:text="${tag.tagName}"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="reply-list" id="reply-list">
+                    <div class="title">
+                        回复列表
+                    </div>
+                    <div class="reply-loading shadow">
+                        <i class="iconfont icon-loading rotate-item"></i>
+                        <div>加载中~</div>
+                    </div>
+                    <div class="reply-empty shadow">
+                        <svg class="icon icon-feidie" aria-hidden="true">
+                            <use xlink:href="#icon-feidie"></use>
+                        </svg>
+                        <div>暂时木有内容~</div>
+                        <!--<i class="iconfont icon-feidie"></i>-->
+                    </div>
+                    <div class="sub-reply">
+                        <div class="item shadow clone">
+                            <div class="item-head">
+                                <span class="author"></span>
+                                <span class="date-prefix">回复于</span>
+                                <span class="date"></span>
+                                <span class="examine hide">审核中</span>
+                            </div>
+                            <div class="reply-content">
+                                <div class="hover">
+                                    <div class="content"></div>
+                                    <div class="operation">
+                                        <a href="javascript:;" class="show-reply waves-effect waves-button">回复</a>
+                                    </div>
+                                </div>
+                                <div class="sub-reply"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reply-pagenation hide">
+                        <a href="javascript:;" class="prev">上一页</a>
+                        <span>
+                            <a href="javascript:;" class="hide">1</a>
+                        </span>
+                        <a href="javascript:;" class="next">下一页</a>
+                    </div>
+                </div>
+                <div class="reply-box shadow">
+                    <form th:action="@{/user/doReply}" method="post" id="reply-form" autocomplete="off">
+                        <div class="close-reply">
+                            <i class="iconfont icon-round_close_fill_light waves-effect waves-button waves-light"></i>
+                        </div>
+                        <div class="title">开始你的表演ಠᴗಠ</div>
+
+                        <input class="articleId" name="articleId" type="hidden" th:value="${article.id}">
+                        <input class="parentReplyId" name="parentReplyId" type="hidden">
+                        <input class="topReplyId" name="topReplyId" type="hidden">
+                        <input class="captcha" name="captcha" type="hidden">
+                        <div class="item-line">
+                            <div class="effect-item">
+                                <input class="effect-input nickName"
+                                       th:classappend="${#strings.isEmpty(session.menberInfo?.nickName)?'':'has-content'}"
+                                       type="text" name="nickName" th:value="${session.menberInfo?.nickName}">
+                                <label>昵称*</label>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+                        <div class="item-line">
+                            <div class="effect-item">
+                                <input class="effect-input email"
+                                       th:classappend="${#strings.isEmpty(session.menberInfo?.email)?'':'has-content'}"
+                                       type="text" name="email" th:value="${session.menberInfo?.email}">
+                                <label>邮箱*<span>（请输入正确的邮箱格式）</span></label>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+                        <div class="item-line">
+                            <div class="effect-item">
+                                <input class="effect-input site"
+                                       th:classappend="${#strings.isEmpty(session.menberInfo?.website)?'':'has-content'}"
+                                       type="text" name="site" th:value="${session.menberInfo?.website}">
+                                <label>站点 http(s)://<span>（请输入正确的网址格式）</span></label>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+                        <div class="item-line">
+                            <div class="effect-item textarea-item">
+                                <textarea class="effect-input effect-textarea content" name="content" maxlength="1024"></textarea>
+                                <label>内容*<span>（请输入回复内容）</span></label>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+                        <div class="item-line check-line flex">
+                            <div class="label">邮件通知</div>
+                            <div class="switchbox">
+                                <input type="checkbox" name="sendmail" checked value="y">
+                                <label></label>
+                            </div>
+                        </div>
+                        <div class="item-line flex">
+                            <button class="waves-effect waves-button waves-light submit-btn"
+                                    type="submit"><i class="iconfont icon-loading hide rotate-item"></i><span
+                                    class="text">发表回复</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <th:block th:insert="layout :: sidebar"></th:block>
+        </div>
+    </div>
+</main>
+<th:block th:insert="layout :: foot"></th:block>
+<script src="https://www.recaptcha.net/recaptcha/api.js?render=6Lf8grAUAAAAAHyz_9ebDdZAkWsYs1NFC42KyxeR"></script>
+<script>
+    var currentPage = 1;
+    var maxPage = 1;
+    var artCode = $(".art-code").val();
+
+    loadReply(1);
+
+    function loadReply(currentPage) {
+        $(".reply-loading").show();
+        $(".reply-list .item").not(".clone").remove();
+        $(".reply-pagenation span a").not(".hide").remove();
+        $.get("/reply/" + artCode + "/page/" + currentPage, function (result) {
+            if (result.success) {
+                if (result.data.records.length > 0) {
+                    $(".reply-empty").hide();
+                    loadChildReply(result.data.records, $(".reply-list"));
+                } else {
+                    $(".reply-empty").show();
+                }
+                maxPage = result.data.pages;
+                if (result.data.pages > 1) {
+                    for (var i = 1; i <= result.data.pages; i++) {
+                        var curr = $(".reply-pagenation span a.hide").clone(true).appendTo(".reply-pagenation span").removeClass("hide");
+                        curr.text(i);
+                        curr.attr("page", i);
+                        if (currentPage == i) {
+                            curr.addClass("active");
+                        }
+                    }
+                    $(".reply-pagenation").removeClass("hide");
+                } else {
+                    $(".reply-pagenation").addClass("hide");
+                }
+            }
+            $(".reply-loading").hide();
+        }, "json")
+    }
+
+    function loadChildReply(replys, box) {
+        for (var i = 0; i < replys.length; i++) {
+            var replyBox = $(".reply-list .item.clone").clone(true).removeClass("clone").appendTo(box.find(".sub-reply").get(0));
+            var reply = replys[i]
+            replyBox.attr("reply-id", reply.id);
+            replyBox.find(".author").text(reply.authorName);
+            replyBox.find(".date").text(formatTime(reply.createTime));
+            if (reply.checkReply != 1) {
+                replyBox.find(".examine").removeClass("hide");
+            }
+            replyBox.find(".content").text(reply.content);
+            if (reply.children.length > 0) {
+                loadChildReply(reply.children, replyBox);
+            }
+        }
+    }
+
+    $(document).on("click", ".reply-pagenation a", function () {
+        if ($(this).hasClass("prev")) {
+            if (currentPage <= 1) {
+                return;
+            }
+            --currentPage;
+        } else if ($(this).hasClass("next")) {
+            if (currentPage >= maxPage) {
+                return;
+            }
+            ++currentPage;
+        } else {
+            currentPage = $(this).attr("page");
+        }
+        console.log(currentPage)
+        loadReply(currentPage);
+
+
+    })
+
+    $(".effect-item .effect-input").focusout(function () {
+        $(this).removeClass("error");
+        if ($(this).val() != "") {
+            $(this).addClass("has-content");
+        } else {
+            $(this).removeClass("has-content");
+        }
+    })
+    $(".effect-item .effect-input").focus(function () {
+        $(this).removeClass("error");
+    })
+
+    $(document).on("click", ".show-reply", function () {
+        var parentId = $(this).parents(".item").first().attr("reply-id");
+        var topId = $(this).parents(".item").last().attr("reply-id");
+        $(".reply-box").find(".parentReplyId").val(parentId);
+        $(".reply-box").find(".topReplyId").val(topId);
+        $(".reply-box").appendTo($(this).parents(".item").first());
+        $("html,body").animate({scrollTop: $(".reply-box").offset().top - 100}, 500);
+    })
+
+    function resetReplyBox() {
+        var box = $(".reply-box");
+        box.find(".parentId").val("");
+        box.find(".topId").val("");
+        box.appendTo($(".art-main"));
+    }
+
+    $(document).on("click", ".close-reply", function () {
+        resetReplyBox();
+    })
+    $(document).on("submit", "#reply-form", function () {
+        $(".submit-btn i").removeClass("hide");
+        $(".submit-btn span").addClass("hide");
+
+        $(".effect-input").removeClass("error");
+        var flag = false;
+        if ($("input.nickName").val() == '') {
+            $("input.nickName").addClass("error");
+            flag = true;
+        }
+        var email = $("input.email").val();
+        if (email == '') {
+            $("input.email").addClass("error").removeClass("show-tips");
+            flag = true;
+        }
+        if ($("textarea.content").val() == '') {
+            $("textarea.content").addClass("error");
+            flag = true;
+        }
+        if (email != '') {
+            if (validateEmail(email)) {
+                $("input.email").removeClass("show-tips").removeClass("error");
+            } else {
+                flag = true;
+                $("input.email").addClass("show-tips").addClass("error");
+            }
+        }
+        var site = $("input.site").val();
+        if (site != '') {
+            if (validateSite(site)) {
+                $("input.site").removeClass("show-tips").removeClass("error");
+            } else {
+                flag = true;
+                $("input.site").addClass("show-tips").addClass("error");
+            }
+        }
+        if (flag) {
+            $(".submit-btn span").removeClass("hide");
+            $(".submit-btn i").addClass("hide");
+            return false;
+        }
+        var _this = this;
+        grecaptcha.ready(function () {
+            grecaptcha.execute('6Lf8grAUAAAAAHyz_9ebDdZAkWsYs1NFC42KyxeR', {action: 'social'}).then(function (token) {
+                $("input.captcha").val(token);
+
+                var action = $(_this).attr("action");
+                var param = $(_this).serialize();
+                $.post(action, param, function (data) {
+                    if (data.success) {
+                        resetReplyBox();
+                        $("[name='content']").val("");
+                        loadReply(currentPage);
+                    } else {
+                        alert(data.msg);
+                    }
+                    $(".submit-btn span").removeClass("hide");
+                    $(".submit-btn i").addClass("hide");
+                }, "json")
+            });
+        });
+        return false;
+    })
+
+    function validateSite(str) {
+        var reg = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/;
+        return reg.test(str);
+    }
+
+    function validateEmail(str) {
+        var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+        return reg.test(str);
+    }
+
+</script>
+</body>
+</html>

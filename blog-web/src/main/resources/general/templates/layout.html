@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <th:block th:fragment="resource">
+        <link rel="dns-prefetch" href="//www.stonewu.com">
+        <link rel="dns-prefetch" href="//cdn.stonewu.com">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta property="og:site_name" th:content="${activeInfo.blogName}">
+        <meta http-equiv="X-UA-Compatible" content="IE=11">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" th:href="@{${activeSetting.blogDomain}+'/favicon.ico'}">
+        <link rel="stylesheet"
+              th:href="@{${activeSetting.cdnDomain}+'/static/css/main.css?v='+${activeSetting.resourceVersion}}"
+              type="text/css" media="all"/>
+        <link rel="stylesheet"
+              th:href="@{${activeSetting.cdnDomain}+'/static/css/waves.min.css?v='+${activeSetting.resourceVersion}}"
+              type="text/css" media="all"/>
+        <link rel="stylesheet" href="https://at.alicdn.com/t/font_1358958_zs1jh6dttl.css" type="text/css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/themes/prism.css">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+        <script src="https://at.alicdn.com/t/font_1358958_zs1jh6dttl.js"></script>
+    </th:block>
+</head>
+<body>
+<th:block th:fragment="header">
+    <div class="nav-side">
+        <a class="logo" th:href="@{${activeSetting.blogDomain}+'/'}" th:text="${activeInfo.blogName}">
+            StoneWu的博客
+        </a>
+        <div class="item" th:each="category:${categorys}"
+             th:classappend="${currCategory?.identName == category.identName?'active':''}">
+            <a th:href="@{${activeSetting.blogDomain}+'/category/'+${category.identName}}"
+               th:text="${category.className}">分类名</a>
+        </div>
+    </div>
+    <header class="header" th:classappend="${isSearch!=null&&isSearch?'active-search':''}">
+        <div class="header-content">
+            <div class="container">
+                <div class="nav-side-btn">
+                    <i class="iconfont icon-round_menu_fill"></i>
+                </div>
+                <a class="logo nowraptext" th:href="@{${activeSetting.blogDomain}+'/'}"
+                   th:text="${activeInfo.blogName}">
+                    StoneWu的博客
+                </a>
+                <div class="nav">
+                    <div class="item" th:each="category:${categorys}"
+                         th:classappend="${currCategory?.identName == category.identName?'active':''}">
+                        <a th:href="@{${activeSetting.blogDomain}+'/category/'+${category.identName}}"
+                           th:text="${category.className}">分类名</a>
+                    </div>
+                </div>
+                <div class="bar">
+                    <div class="search-box">
+                        <div class="search-wrapper">
+                            <div class="input-holder">
+                                <input type="text" class="search-input" placeholder="输入搜索内容" th:value="${keywords}"/>
+                                <button class="search-icon search-btn">
+                                    <i class="iconfont icon-search-bold"></i>
+                                </button>
+                            </div>
+                            <span class="close search-close">
+                            <!--使用icon生成叉叉-->
+                                <!--<i class="iconfont icon-close"></i>-->
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+</th:block>
+<th:block th:fragment="middlebar">
+    <div class="middle-bar" th:if="${isIndex != null}" id="middle-bar"
+         th:styleappend="${activeInfo.useBg?'background-image: url('+activeInfo.middleBg+')':''}">
+        <div id="middle-bar-bg">
+            <div class="container">
+                <h1 th:text="${activeInfo.helloMsg}">Hello world!</h1>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:fragment="emptybar">
+    <div style="height: 4rem">
+    </div>
+</th:block>
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-8 art-list">
+            </div>
+
+            <th:block th:fragment="sidebar">
+                <div class="col-4 sidebar">
+                    <div class="sidebar-content">
+                        <div class="item shadow">
+                            <div class="title">
+                                最近发布
+                            </div>
+                            <div class="content">
+                                <div class="item-line" th:each="article:${recentArticle}">
+                                    <a class="nowraptext dot"
+                                       th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}}"
+                                       th:text="${article.title}"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item shadow" th:if="${#lists.size(recentReplyArticle) > 0}">
+                            <div class="title">
+                                最近回复
+                            </div>
+                            <div class="content">
+                                <div class="item-line" th:each="article:${recentReplyArticle}">
+                                    <a class="nowraptext dot"
+                                       th:href="@{${activeSetting.blogDomain}+'/article/'+${article.identName}}"
+                                       th:text="${article.title}"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item shadow" th:if="${#lists.size(yearGroups) > 0}">
+                            <div class="title">
+                                文章归档
+                            </div>
+                            <div class="content">
+                                <div class="item-line" th:each="group:${yearGroups}">
+                                    <a class="nowraptext dot"
+                                       th:href="@{${activeSetting.blogDomain}+'/group/'+${group.year}}"
+                                       th:text="${group.year}+'年 ( '+${group.count}+' )'"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item shadow tags">
+                            <div class="title">
+                                标签
+                            </div>
+                            <div class="content">
+                                <label class="tag-item" th:each="tag:${topTags}">
+                                    <a class="nowraptext dot"
+                                       th:href="@{${activeSetting.blogDomain}+'/tag/'+${tag.tagName}}"
+                                       th:text="${tag.tagName +' ('+ tag.artCount + ')'}">
+                                    </a>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+
+        </div>
+    </div>
+</main>
+<th:block th:fragment="foot">
+    <div class="back-to-top"><i class="iconfont icon-md-rocket waves-effect waves-light"></i></div>
+    <footer class="footer">
+        <div class="container">
+            <div class="copyright">
+                <span class="text">Copyright © <th:block
+                        th:text="${#dates.format(now, 'yyyy')}"></th:block> </span>
+                <span class="light-text">StoneWu's blog</span>
+            </div>
+            <div class="beian">
+                <div class="beian-line">
+                    <span class="text">Developed by </span>
+                    <span class="light-text">StoneWu</span>
+                </div>
+                <div class="beian-line">
+                    <span class="text"> &nbsp;<span class="beian-split">|</span>&nbsp; <a id="beianhref" target="_blank" href="https://beian.miit.gov.cn">粤ICP备15107018号</a> </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script th:src="@{${activeSetting.cdnDomain}+'/static/js/waves.min.js?v='+${activeSetting.resourceVersion}}"></script>
+    <script th:src="@{${activeSetting.cdnDomain}+'/static/js/main.js?v='+${activeSetting.resourceVersion}}"></script>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?d3328ca09c9d10ba6e76021087d3d01c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</th:block>
+</body>
+</html>

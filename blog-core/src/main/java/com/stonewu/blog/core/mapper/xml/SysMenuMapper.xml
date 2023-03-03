@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.SysMenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.SysMenu">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="permission_code" property="permissionCode"/>
+        <result column="uri" property="uri"/>
+        <result column="sort" property="sort"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="type" property="type"/>
+        <result column="show" property="show"/>
+        <result column="desc" property="desc"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, permission_code, uri, sort, parent_id, type, show, desc
+    </sql>
+
+    <select id="selectMenuByUser" resultMap="BaseResultMap" parameterType="com.stonewu.blog.core.entity.SysMenu">
+        SELECT m.* FROM sys_user_role ur
+        LEFT JOIN sys_role_permission rp on ur.role_id = rp.role_id
+        LEFT JOIN sys_menu m on rp.permission = m.permission_code
+        WHERE ur.uid = #{id}
+    </select>
+</mapper>

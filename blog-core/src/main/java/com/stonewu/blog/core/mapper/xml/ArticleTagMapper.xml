@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stonewu.blog.core.mapper.ArticleTagMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.stonewu.blog.core.entity.ArticleTag">
+        <id column="id" property="id"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    <resultMap id="ArticleTagInfoMap" type="com.stonewu.blog.core.entity.custom.ArticleTagInfo">
+        <id column="id" property="id"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="article_id" property="articleId"/>
+    </resultMap>
+    <resultMap id="TagCountInfoMap" type="com.stonewu.blog.core.entity.custom.TagCountInfo">
+        <id column="id" property="id"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="art_count" property="artCount"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tag_name, create_time
+    </sql>
+
+    <select id="findTagByArticleId" parameterType="java.lang.Integer" resultMap="ArticleTagInfoMap">
+        select t.*,l.article_id
+        from article_tag t left join article_tag_link l on l.tag_id = t.id
+        where l.article_id = #{id}
+    </select>
+
+    <select id="getMostArtTag" resultMap="TagCountInfoMap">
+        SELECT
+            atag.*,
+            COUNT( a.id ) art_count
+        FROM
+            article_tag atag
+            LEFT JOIN article_tag_link atl ON atag.id = atl.tag_id
+            LEFT JOIN article a ON a.id = atl.article_id and a.status = 1
+        GROUP BY
+            atag.id
+        HAVING art_count > 0
+        ORDER BY
+            art_count DESC
+        LIMIT 0, 50
+    </select>
+</mapper>
